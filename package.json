@@ -2,9 +2,9 @@
   "name": "birdman",
   "version": "1.0.0",
   "description": "A TypeScript implementation of a Marabu PoW blockchain node.",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,13 @@
   "bugs": {
     "url": "https://github.com/k4m4/birdman/issues"
   },
-  "homepage": "https://github.com/k4m4/birdman#readme"
+  "homepage": "https://github.com/k4m4/birdman#readme",
+  "devDependencies": {
+    "@types/node": "^15.12.2",
+    "@types/semver": "^7.3.6",
+    "nodemon": "^2.0.7",
+    "semver": "^5.7.1",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.2"
+  }
 }
