@@ -4,6 +4,8 @@
   "description": "A TypeScript implementation of a Marabu PoW blockchain node.",
   "main": "src/index.js",
   "scripts": {
+    "build": "tsc",
+    "start": "node build/src/index.js",
     "dev": "nodemon"
   },
   "repository": {
