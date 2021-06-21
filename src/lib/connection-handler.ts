@@ -5,7 +5,7 @@ import { PeerAddress } from './peers';
 import type { Address } from './peers';
 
 export interface IConnectionHandler {
-    getAddress (): PeerAddress;
+	getAddress (): PeerAddress;
 	sendPayload (payload: string): void;
 	sendMessage (message: Message): void;
 	end (): void;
@@ -18,19 +18,19 @@ class ConnectionHandler implements IConnectionHandler {
 		this.socket = socket;
 	}
 
-    getAddress (): PeerAddress {
-        return new PeerAddress(this.socket.address() as Address);
-    }
+	getAddress (): PeerAddress {
+		return new PeerAddress(this.socket.address() as Address);
+	}
 
-	sendPayload (payload: string) {
+	sendPayload (payload: string): void {
 		this.socket.write(payload + '\n');
 	}
 
-	sendMessage (message: Message) {
+	sendMessage (message: Message): void {
 		this.sendPayload(canonicalize(message));
 	}
 
-	end () {
+	end (): void {
 		this.socket.end();
 	}
 }
