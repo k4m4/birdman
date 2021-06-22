@@ -5,8 +5,8 @@ import type {
 	Peers as PeersMessage,
 	GetPeers as GetPeersMessage,
 } from '../types';
-import { BIRDMAN_VERSION, NODE_AGENT } from '../constants';
-import { isString, isValidNodeVersion } from '../utils/validation';
+import { LATEST_NODE_VERSION, NODE_AGENT } from '../constants';
+import { isString, isValidNodeVersion, isPort, isPeerAddress } from '../utils/validation';
 import type { IConnectionHandler } from './connection-handler';
 import { knownPeers, PeerAddress } from './peers';
 
@@ -14,8 +14,9 @@ export type MessageHandlerMethod = (message: Message) => void;
 export type MessageValidatorMethod = (message: Message) => void;
 
 class MessageHandler {
-	connection: IConnectionHandler;
-	peerAddress: PeerAddress;
+	private connection: IConnectionHandler;
+	private peerAddress: PeerAddress;
+    private handshakeRequested: boolean = false;
 
 	handlerByMessageType: Record<Message['type'], MessageHandlerMethod> = {
 		hello: (message: Message) => this.handleHello(message as HelloMessage),
@@ -31,12 +32,18 @@ class MessageHandler {
 		peers: (message: Message) => this.validatePeers(message as PeersMessage),
 	};
 
-	constructor (connection: IConnectionHandler) {
+	constructor (connection: IConnectionHandler, initiateHandshake: boolean = false) {
 		this.connection = connection;
-		this.peerAddress = this.connection.getAddress();
+		this.peerAddress = connection.getAddress();
+        if (initiateHandshake) {
+            this.handshakeRequested = true;
+            this.hello();
+        }
 	}
 
 	handleMessage (message: Message): void {
+        console.log(`Message received from ${this.peerAddress}:`, { message });
+
 		if (
 			!Object.keys(this.handlerByMessageType).includes(message.type) ||
 			!Object.keys(this.validatorByMessageType).includes(message.type)
@@ -90,14 +97,14 @@ class MessageHandler {
 			throw new Error('Unsupported node version received');
 		}
 
-		knownPeers.set(this.peerAddress.toString(), this.peerAddress.address);
-
-		this.connection.sendMessage({
-			type: 'hello',
-			version: BIRDMAN_VERSION,
-			agent: NODE_AGENT,
-		});
-	}
+        const address = this.peerAddress.toString();
+        if (this.handshakeRequested) {
+            this.getPeers();
+        } else {
+            this.hello();
+		    knownPeers.set(address, this.peerAddress.address);
+        }
+    }
 
 	private handleError (message: ErrorMessage) {
 		console.error('Error received by peer: ' + message.error);
@@ -105,18 +112,38 @@ class MessageHandler {
 	}
 
 	private handleGetPeers (message: GetPeersMessage): void {
+        const peers: string[] = Array.from(knownPeers.keys());
 		this.connection.sendMessage({
 			type: 'peers',
-			peers: Array.from(knownPeers.keys()),
+			peers,
 		});
 	}
 
 	private handlePeers (message: PeersMessage) {
 		message.peers.forEach((peer: string) => {
+            if (knownPeers.has(peer)) {
+                return;
+            }
+
 			const parsedPeer = new PeerAddress(peer);
-			knownPeers.set(parsedPeer.toString(), parsedPeer.address);
-		});
+            const { port, address } = parsedPeer.address;
+            // TODO: validate based on address family
+            if (!isPort(port) || !isPeerAddress(parsedPeer.toString())) {
+                console.error(`Ignored invalid peer: ${parsedPeer}`);
+                return;
+            }
+
+            knownPeers.set(peer, parsedPeer.address);
+        });
 	}
+
+    private hello (): void {
+		this.connection.sendMessage({
+			type: 'hello',
+			version: LATEST_NODE_VERSION,
+			agent: NODE_AGENT,
+        });
+    }
 
 	private getPeers (): void {
 		this.connection.sendMessage({

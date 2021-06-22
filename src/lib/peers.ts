@@ -1,4 +1,8 @@
+import fs from 'fs';
 import { parsePeer } from '../utils/parsing';
+import type { IStore } from '../utils/storage';
+import { AddressStore } from '../utils/storage';
+import { initiateConnection } from '..';
 
 export interface Address {
 	address: string;
@@ -6,7 +10,38 @@ export interface Address {
 	port: number;
 }
 
-export const knownPeers: Map<string, Address> = new Map();
+export class KnownPeers {
+    peers: Map<string, Address>;
+    store: IStore<Map<string, Address>>;
+
+    constructor(store: IStore<Map<string, Address>>) {
+        this.peers = new Map<string, Address>(store.read());
+        this.store = store;
+    }
+
+    public get(key: string): Address | undefined {
+        return this.peers.get(key);
+    }
+
+    public has(key: string): boolean {
+        return this.peers.has(key);
+    }
+
+    public set(key: string, value: Address): void {
+        const address = new PeerAddress(value);
+        if (this.peers.get(key)) {
+            return;
+        }
+ 
+        this.peers.set(key, value);
+        this.store.write(address.toString());
+        initiateConnection(address);
+    }
+
+    public keys(): IterableIterator<string> {
+        return this.peers.keys();
+    }
+}
 
 export class PeerAddress {
 	private _address: Address;
@@ -29,3 +64,5 @@ export class PeerAddress {
 		return peerAddress + ':' + port;
 	}
 }
+
+export const knownPeers: KnownPeers = new KnownPeers(new AddressStore('data/peers.txt'));
