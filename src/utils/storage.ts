@@ -8,24 +8,24 @@ export interface IStore<T> {
 }
 
 export class AddressStore implements IStore<Map<string, Address>> {
-    filename: string;
+	filename: string;
 
-    constructor(filename: string) {
-        this.filename = filename;
-    }
+	constructor(filename: string) {
+		this.filename = filename;
+	}
 
-    public read(): Map<string, Address> {
-        return new Map<string, Address>(
-            fs.readFileSync(this.filename, 'utf-8')
-                .split('\n')
-                .filter(Boolean)
-                .map((line: string) => {
-                    return [ line, parsePeer(line) ];
-                })
-        );
-    }
+	public read(): Map<string, Address> {
+		return new Map<string, Address>(
+			fs.readFileSync(this.filename, 'utf-8')
+				.split('\n')
+				.filter(Boolean)
+				.map((line: string) => {
+					return [ line, parsePeer(line) ];
+				})
+		);
+	}
 
-    public write(value: string): void {
-        fs.appendFileSync(this.filename, value + '\n');
-    }
+	public write(value: string): void {
+		fs.appendFileSync(this.filename, value + '\n');
+	}
 }

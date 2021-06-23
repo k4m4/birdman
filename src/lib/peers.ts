@@ -1,7 +1,13 @@
-import fs from 'fs';
 import { parsePeer } from '../utils/parsing';
 import type { IStore } from '../utils/storage';
 import { AddressStore } from '../utils/storage';
+import {
+	isIPv4Address,
+	isIPv6Address,
+	isDNSHostname,
+	isPort,
+} from '../utils/validation';
+import { KNOWN_PEERS_FILENAME } from '../constants';
 import { initiateConnection } from '..';
 
 export interface Address {
@@ -11,37 +17,44 @@ export interface Address {
 }
 
 export class KnownPeers {
-    peers: Map<string, Address>;
-    store: IStore<Map<string, Address>>;
+	peers: Map<string, Address>;
+	store: IStore<Map<string, Address>>;
 
-    constructor(store: IStore<Map<string, Address>>) {
-        this.peers = new Map<string, Address>(store.read());
-        this.store = store;
-    }
+	constructor(store: IStore<Map<string, Address>>) {
+		this.peers = new Map<string, Address>(store.read());
+		this.store = store;
+	}
 
-    public get(key: string): Address | undefined {
-        return this.peers.get(key);
-    }
+	public get(key: string): Address | undefined {
+		return this.peers.get(key);
+	}
 
-    public has(key: string): boolean {
-        return this.peers.has(key);
-    }
+	public has(key: string): boolean {
+		return this.peers.has(key);
+	}
 
-    public set(key: string, value: Address): void {
-        const address = new PeerAddress(value);
-        if (this.peers.get(key)) {
-            return;
-        }
- 
-        this.peers.set(key, value);
-        this.store.write(address.toString());
-        initiateConnection(address);
-    }
+	public set(key: string, value: Address): void {
+		const address = new PeerAddress(value);
+		if (this.peers.get(key)) {
+			return;
+		}
+	
+		this.peers.set(key, value);
+		this.store.write(address.toString());
+		initiateConnection(address);
+	}
 
-    public keys(): IterableIterator<string> {
-        return this.peers.keys();
-    }
+	public keys(): IterableIterator<string> {
+		return this.peers.keys();
+	}
 }
+
+type AddressValidator = (address: string) => boolean;
+const addressValidatorByFamily: Record<Address['family'], AddressValidator> = {
+	IPv4: isIPv4Address,
+	IPv6: isIPv6Address,
+	DNS: isDNSHostname,
+};
 
 export class PeerAddress {
 	private _address: Address;
@@ -58,6 +71,11 @@ export class PeerAddress {
 		return this._address;
 	}
 
+	public isValid(): boolean {
+		const { port, family, address } = this._address;
+		return isPort(port) && addressValidatorByFamily[family](address);
+	}
+
 	public toString(): string {
 		const { address, family, port } = this._address;
 		const peerAddress = family === 'IPv6' ? '[' + address + ']' : address;
@@ -65,4 +83,4 @@ export class PeerAddress {
 	}
 }
 
-export const knownPeers: KnownPeers = new KnownPeers(new AddressStore('data/peers.txt'));
+export const knownPeers: KnownPeers = new KnownPeers(new AddressStore(KNOWN_PEERS_FILENAME));

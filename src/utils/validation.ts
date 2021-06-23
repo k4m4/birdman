@@ -10,9 +10,7 @@ const IPv6Regex = new RegExp('(?:^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-
 const DNSHostnameRegex = new RegExp('(?:^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$)');
 
 export const isIPv4Address = (address: string): boolean => IPv4Regex.test(address);
-
 export const isIPv6Address = (address: string): boolean => IPv6Regex.test(address);
-
 export const isDNSHostname = (address: string): boolean => DNSHostnameRegex.test(address);
 
 export const isPeerAddress = (address: string): boolean => isIPv4Address(address) || isIPv6Address(address) || isDNSHostname(address);

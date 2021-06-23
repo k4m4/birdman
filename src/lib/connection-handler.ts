@@ -13,19 +13,19 @@ export interface IConnectionHandler {
 
 class ConnectionHandler implements IConnectionHandler {
 	private socket: Socket;
-    private address: Address;
+	private address: PeerAddress;
 
-	constructor (socket: Socket, address?: Address) {
+	constructor (socket: Socket, address?: PeerAddress) {
 		this.socket = socket;
-        this.address = address || this.socket.address() as Address; 
+		this.address = address || new PeerAddress(this.socket.address() as Address); 
 	}
 
 	public getAddress (): PeerAddress {
-        if (Object.keys(this.address).length === 0) {
-            throw new Error('Could not resolve peer address');
-        }
+		if (Object.keys(this.address.address).length === 0) {
+			throw new Error('Could not resolve peer address');
+		}
 
-		return new PeerAddress(this.address);
+		return this.address;
 	}
 
 	public sendPayload (payload: string): void {
@@ -33,7 +33,7 @@ class ConnectionHandler implements IConnectionHandler {
 	}
 
 	public sendMessage (message: Message): void {
-        console.log(`Message sent to ${this.getAddress()}:`, { message });
+		console.log(`Message sent to ${this.getAddress()}:`, { message });
 		this.sendPayload(canonicalize(message));
 	}
 
