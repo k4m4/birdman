@@ -127,7 +127,7 @@ class MessageHandler {
 
 			const parsedPeer = new PeerAddress(peerKey);
 			if (!parsedPeer.isValid()) {
-				console.error(`Ignored invalid peer: ${parsedPeer}`);
+				console.error(`Ignored invalid peer: ${peerKey}`);
 				return;
 			}
 
