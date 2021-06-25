@@ -13,7 +13,6 @@ const handleConnection = (options?: {
     initializeHandshake?: boolean;
     peerAddress?: PeerAddress;
 }) => (socket: Socket) => {
-	console.log(socket.remoteAddress)
 	const readlineInterface = readline.createInterface({
 		input: socket,
 		output: socket,
