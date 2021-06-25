@@ -7,6 +7,8 @@ import { PORT, IP } from './constants';
 import { knownPeers, PeerAddress } from './lib/peers';
 import type { Address } from './lib/peers';
 
+export const connections: ConnectionHandler[] = [];
+
 const handleConnection = (options?: {
     initializeHandshake?: boolean;
     peerAddress?: PeerAddress;
@@ -37,10 +39,17 @@ const handleConnection = (options?: {
 	socket.on('error', handleConnectionError);
 
 	const connectionHandler = new ConnectionHandler(socket, peerAddress);
+    connections.push(connectionHandler);
+
 	const messageHandler = new MessageHandler(connectionHandler, options?.initializeHandshake);
 
 	const handleLineRead = (line: string) => {
 		try {
+            // TODO: figure out a way to not need this
+            if (line.startsWith('PROXY')) {
+                return;
+            }
+
 			const message: Message = JSON.parse(line);
 			messageHandler.handleMessage(message);
 		} catch (error) {

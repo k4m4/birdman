@@ -8,7 +8,6 @@ import {
 	isPort,
 } from '../utils/validation';
 import { KNOWN_PEERS_FILENAME } from '../constants';
-import { initiateConnection } from '..';
 
 export interface Address {
 	address: string;
@@ -41,7 +40,6 @@ export class KnownPeers {
 	
 		this.peers.set(key, value);
 		this.store.write(address.toString());
-		initiateConnection(address);
 	}
 
 	public keys(): IterableIterator<string> {

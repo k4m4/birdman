@@ -3,27 +3,27 @@ interface Outpoint {
 	index: number;
 }
 
-interface TransactionInput {
+export interface TransactionInput {
 	outpoint: Outpoint;
 	sig: string;
 }
 
 type TransactionInputs = Array<TransactionInput>;
 
-interface TransactionOutput {
+export interface TransactionOutput {
 	value: number;
 	pubkey: string;
 }
 
 type TransactionOutputs = Array<TransactionOutput>;
 
-interface Transaction {
+export interface Transaction {
 	type: "transaction";
 	inputs: TransactionInputs;
 	outputs: TransactionOutputs;
 }
 
-interface Block {
+export interface Block {
 	type: "block";
 	txids: string[];
 	nonce: string;
@@ -51,17 +51,17 @@ export interface Peers {
 	peers: string[];
 }
 
-interface GetObject {
+export interface GetObject {
 	type: "getobject";
 	objectid: string;
 }
 
-interface IHaveObject {
+export interface IHaveObject {
 	type: "ihaveobject";
 	objectid: string;
 }
 
-interface Object {
+export interface Object {
 	type: "object";
 	object: ApplicationObject;
 }
@@ -93,10 +93,10 @@ export type Message =
 	| Hello
 	| Error
 	| GetPeers
-	| Peers;
-	// | GetObject
-	// | IHaveObject
-	// | Object
+	| Peers
+	| GetObject
+	| IHaveObject
+	| Object;
 	// | GetMempool
 	// | Mempool
 	// | GetChainTip
