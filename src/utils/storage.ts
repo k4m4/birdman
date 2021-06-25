@@ -16,7 +16,7 @@ const parseFile = <T>(filename: string, parser: LineParserMethod<T>): Array<[ st
 		.filter(Boolean)
 		.map(parser);
 
-    return lines;
+	return lines;
 };
 
 export type AddressMap = Map<string, Address>;
@@ -55,9 +55,8 @@ export class ObjectStore implements IObjectStore {
 	public read(): ObjectMap {
 		return new Map(
 			parseFile(this.filename, (line: string) => {
-                // TODO: fix this mess
-                const [objectid, ...objectParts] = line.split(':');
-                const object = objectParts.join(':');
+				const separatorIndex = line.indexOf(':');
+				const [objectid, object] = [line.slice(0, separatorIndex), line.slice(separatorIndex + 1)];
 				return [ objectid, JSON.parse(object) ];
 			})
 		);

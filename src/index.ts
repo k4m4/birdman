@@ -13,6 +13,7 @@ const handleConnection = (options?: {
     initializeHandshake?: boolean;
     peerAddress?: PeerAddress;
 }) => (socket: Socket) => {
+	console.log(socket.remoteAddress)
 	const readlineInterface = readline.createInterface({
 		input: socket,
 		output: socket,
@@ -39,16 +40,16 @@ const handleConnection = (options?: {
 	socket.on('error', handleConnectionError);
 
 	const connectionHandler = new ConnectionHandler(socket, peerAddress);
-    connections.push(connectionHandler);
+	connections.push(connectionHandler);
 
 	const messageHandler = new MessageHandler(connectionHandler, options?.initializeHandshake);
 
 	const handleLineRead = (line: string) => {
 		try {
-            // TODO: figure out a way to not need this
-            if (line.startsWith('PROXY')) {
-                return;
-            }
+			// TODO: figure out a way to not need this
+			if (line.startsWith('PROXY')) {
+				return;
+			}
 
 			const message: Message = JSON.parse(line);
 			messageHandler.handleMessage(message);

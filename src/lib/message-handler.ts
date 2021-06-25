@@ -109,7 +109,9 @@ class MessageHandler {
 		throw new Error('Received malformed payload for message of type `error`');
 	}
 
-	private validateGetPeers (message: GetPeersMessage): void {}
+	private validateGetPeers (message: GetPeersMessage): void {
+		return;
+	}
 
 	private validatePeers (message: PeersMessage) {
 		const { peers } = message;
@@ -145,7 +147,7 @@ class MessageHandler {
 			this.validatorByApplicationObjectType[object.type](object);
 		} catch (error: any) {
 			// TODO: Check if `error instanceof ObjectValidationError`
-            throw new Error(`Received malformed payload for message of type \`object\`${error?.message ? `: "${error.message}"` : ''}`);
+			throw new Error(`Received malformed payload for message of type \`object\`${error?.message ? `: "${error.message}"` : ''}`);
 		}
 	}
 
@@ -196,7 +198,7 @@ class MessageHandler {
 
 	private handleGetPeers (message: GetPeersMessage): void {
 		const peers: string[] = Array.from(knownPeers.keys());
-        // TODO: send myself here too
+		// TODO: send myself here too
 		this.connection.sendMessage({
 			type: 'peers',
 			peers,
@@ -216,14 +218,14 @@ class MessageHandler {
 			}
 
 			knownPeers.set(peerKey, parsedPeer.address);
-            initiateConnection(parsedPeer);
+			initiateConnection(parsedPeer);
 		});
 	}
 
 	private handleGetObject (message: GetObjectMessage): void {
 		const object = knownObjects.get(message.objectid);
 		if (!object) {
-            return;
+			return;
 		}
 
 		this.object(object);
@@ -247,7 +249,7 @@ class MessageHandler {
 		// TODO: make sure JSON.stringify produces the desired string here
 		const objectid = createHash(JSON.stringify(object));
 		knownObjects.set(objectid, object);
-        this.iHaveObject({ objectid });
+		this.iHaveObject({ objectid });
 	}
 
 	private hello (): void {
@@ -277,21 +279,21 @@ class MessageHandler {
 		this.connection.sendMessage(message);
 	}
 
-    // TODO: Create util for this TS Omit
+	// TODO: Create util for this TS Omit
 	private iHaveObject ({ objectid }: Omit<IHaveObjectMessage, 'type'>): void {
 		const message: IHaveObjectMessage = {
 			type: 'ihaveobject',
 			objectid,
 		};
 
-        connections.forEach((connection: IConnectionHandler) => {
-            if (connection === this.connection) {
-                return;
-            }
+		connections.forEach((connection: IConnectionHandler) => {
+			if (connection === this.connection) {
+				return;
+			}
 
-		    connection.sendMessage(message);
-        });
-    }
+            connection.sendMessage(message);
+		});
+	}
 
 	private object (object: ApplicationObject): void {
 		const message: ObjectMessage = {
