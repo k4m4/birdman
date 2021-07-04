@@ -76,7 +76,7 @@ const handleConnection = (options?: {
 export const initiateConnection = (peer: PeerAddress): void => {
 	try {
 		const { port, address } = peer.address;
-		const handleCreateConnection = handleConnection({ initializeHandshake: true, peerAddress: peer })
+		const handleCreateConnection = handleConnection({ initializeHandshake: true, peerAddress: peer });
 		const socket: Socket = createConnection(port, address);
 		handleCreateConnection(socket);
 	} catch (error: unknown) {
