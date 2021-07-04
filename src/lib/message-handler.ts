@@ -291,7 +291,7 @@ class MessageHandler {
 				return;
 			}
 
-            connection.sendMessage(message);
+			connection.sendMessage(message);
 		});
 	}
 
