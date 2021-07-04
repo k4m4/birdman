@@ -9,6 +9,7 @@ import type { Address } from './lib/peers';
 
 export const connections: ConnectionHandler[] = [];
 
+// TODO: remove initializeHandshake & send hello on connection
 const handleConnection = (options?: {
     initializeHandshake?: boolean;
     peerAddress?: PeerAddress;

@@ -9,6 +9,7 @@ import {
 } from '../utils/validation';
 import { KNOWN_PEERS_FILENAME } from '../constants';
 
+// TODO: rename address to host
 export interface Address {
 	address: string;
 	family: 'IPv4' | 'IPv6' | 'DNS';
