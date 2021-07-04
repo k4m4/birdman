@@ -20,10 +20,15 @@ import {
 	isString,
 	isValidNodeVersion,
 	isSHA256,
-	isValidObject,
 	isValidTransactionInput,
 	isValidTransactionOutput,
-	isValidBlock,
+	isValidTransactionId,
+	isValidNonce,
+	isValidBlockId,
+	isValidUNIXTimestamp,
+	isValidMiningTarget,
+	isValidMiner,
+	isValidNote,
 } from '../utils/validation';
 import { createHash } from '../utils/hashing';
 import type { IConnectionHandler } from './connection-handler';
@@ -157,7 +162,6 @@ class MessageHandler {
 
 	private validateTransaction (object: TransactionObject) {
 		const { inputs, outputs } = object;
-		// TODO: validate inputs & outputs
 		if (
 			inputs &&
 			Array.isArray(inputs) &&
@@ -173,8 +177,16 @@ class MessageHandler {
 	}
 
 	private validateBlock (object: BlockObject) {
-		// TODO: validate block
-		if (isValidBlock(object)) {
+		if (
+			Array.isArray(object.txids) &&
+			object.txids.every(isValidTransactionId) &&
+			isValidNonce(object.nonce) &&
+			(!object.previd || isValidBlockId(object.previd)) &&
+			isValidUNIXTimestamp(object.created) &&
+			isValidMiningTarget(object.T) &&
+			(!object.miner || isValidMiner(object.miner)) &&
+			(!object.note || isValidNote(object.note))
+		) {
 			return;
 		}
 
@@ -246,10 +258,6 @@ class MessageHandler {
 
 	private handleObject (message: ObjectMessage): void {
 		const { object } = message;
-		if (!isValidObject(object)) {
-			throw new Error('Object failed validation');
-		}
-
 		// TODO: make sure JSON.stringify produces the desired string here
 		const objectid = createHash(JSON.stringify(object));
 		knownObjects.set(objectid, object);

@@ -1,4 +1,4 @@
-interface Outpoint {
+export interface Outpoint {
 	txid: string;
 	index: number;
 }
@@ -29,7 +29,9 @@ export interface Block {
 	nonce: string;
 	previd: string | null;
 	created: string;
+	T: string;
 	miner?: string;
+	note?: string;
 }
 
 export type ApplicationObject =
