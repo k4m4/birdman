@@ -20,10 +20,10 @@ const handleConnection = (options?: {
 	});
 
 	const peerAddress: PeerAddress = options?.peerAddress || new PeerAddress(socket.address() as Address);
-	const { address, port } = peerAddress.address;
+	const { host, port } = peerAddress.address;
 
 	const handleConnectionOpen = (): void => {
-		console.log(`Connection created with ${address}:${port}`);
+		console.log(`Connection created with ${host}:${port}`);
 	};
 
 	const handleConnectionError = (): void => {
@@ -31,7 +31,7 @@ const handleConnection = (options?: {
 	};
 
 	const handleConnectionEnd = (): void => {
-		console.log(`Connection with ${address}:${port} closed`);
+		console.log(`Connection with ${host}:${port} closed`);
 		readlineInterface.close();
 	};
 
@@ -75,9 +75,9 @@ const handleConnection = (options?: {
 
 export const initiateConnection = (peer: PeerAddress): void => {
 	try {
-		const { port, address } = peer.address;
+		const { host, port } = peer.address;
 		const handleCreateConnection = handleConnection({ initializeHandshake: true, peerAddress: peer });
-		const socket: Socket = createConnection(port, address);
+		const socket: Socket = createConnection(port, host);
 		handleCreateConnection(socket);
 	} catch (error: unknown) {
 		console.error(`Failed to initiate connection with ${peer}:`, error);

@@ -5,14 +5,14 @@ export const parsePeer = (string: string): Address => {
 	const components = string.split(':');
 	const parsedPeer: Partial<Address> = {};
 	if (components.length > 2) {
-		parsedPeer.address = components.slice(0, -1).join(':').slice(1, -1);
+		parsedPeer.host = components.slice(0, -1).join(':').slice(1, -1);
 		parsedPeer.port = Number(components.pop() as string);
 		parsedPeer.family = 'IPv6';
 	} else {
-		const [address, port] = components;
-		parsedPeer.address = address;
+		const [host, port] = components;
+		parsedPeer.host = host;
 		parsedPeer.port = Number(port);
-		parsedPeer.family = isIPv4Address(address) ? 'IPv4' : 'DNS';
+		parsedPeer.family = isIPv4Address(host) ? 'IPv4' : 'DNS';
 	}
 
 	return parsedPeer as Address;

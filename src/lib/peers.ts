@@ -9,9 +9,8 @@ import {
 } from '../utils/validation';
 import { KNOWN_PEERS_FILENAME } from '../constants';
 
-// TODO: rename address to host
 export interface Address {
-	address: string;
+	host: string;
 	family: 'IPv4' | 'IPv6' | 'DNS';
 	port: number;
 }
@@ -71,13 +70,13 @@ export class PeerAddress {
 	}
 
 	public isValid(): boolean {
-		const { port, family, address } = this._address;
-		return isPort(port) && addressValidatorByFamily[family](address);
+		const { host, port, family } = this._address;
+		return isPort(port) && addressValidatorByFamily[family](host);
 	}
 
 	public toString(): string {
-		const { address, family, port } = this._address;
-		const peerAddress = family === 'IPv6' ? '[' + address + ']' : address;
+		const { host, family, port } = this._address;
+		const peerAddress = family === 'IPv6' ? '[' + host + ']' : host;
 		return peerAddress + ':' + port;
 	}
 }
