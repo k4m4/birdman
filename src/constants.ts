@@ -10,3 +10,5 @@ export const KNOWN_OBJECTS_FILENAME = 'data/objects.txt';
 
 export const PORT = 3000;
 export const IP = '127.0.0.1';
+
+export const BIRDMAN_ADDRESS = '146.185.182.146:1337';

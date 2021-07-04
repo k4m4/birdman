@@ -11,7 +11,11 @@ import type {
 	Transaction as TransactionObject,
 	Block as BlockObject,
 } from '../types';
-import { LATEST_NODE_VERSION, NODE_AGENT } from '../constants';
+import {
+	LATEST_NODE_VERSION,
+	NODE_AGENT,
+	BIRDMAN_ADDRESS,
+} from '../constants';
 import {
 	isString,
 	isValidNodeVersion,
@@ -198,7 +202,7 @@ class MessageHandler {
 
 	private handleGetPeers (message: GetPeersMessage): void {
 		const peers: string[] = Array.from(knownPeers.keys());
-		// TODO: send myself here too
+		peers.push(BIRDMAN_ADDRESS);
 		this.connection.sendMessage({
 			type: 'peers',
 			peers,
