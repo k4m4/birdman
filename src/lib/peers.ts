@@ -1,6 +1,6 @@
 import { parsePeer } from '../utils/parsing';
 import type { IStore } from '../utils/storage';
-import { FileAddressStore } from '../utils/storage';
+import { FileAddressStore } from '../lib/file-address-store';
 import {
 	isIPv4Address,
 	isIPv6Address,

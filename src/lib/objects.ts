@@ -1,5 +1,5 @@
 import type { ApplicationObject } from '../types';
-import { FileObjectStore } from '../utils/storage';
+import { FileObjectStore } from '../lib/file-object-store';
 import type { ObjectMap, IObjectStore } from '../utils/storage';
 import { KNOWN_OBJECTS_FILENAME } from '../constants';
 
