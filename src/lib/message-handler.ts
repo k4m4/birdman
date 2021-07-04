@@ -34,7 +34,7 @@ export type ApplicationObjectValidatorMethod = (object: ApplicationObject) => vo
 class MessageHandler {
 	private connection: IConnectionHandler;
 	private peerAddress: PeerAddress;
-    private handshakeRequested = false;
+	private handshakeRequested = false;
 
 	handlerByMessageType: Record<Message['type'], MessageHandlerMethod> = {
 		hello: (message: Message) => this.handleHello(message as HelloMessage),
