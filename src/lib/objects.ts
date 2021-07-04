@@ -1,5 +1,5 @@
 import type { ApplicationObject } from '../types';
-import { ObjectStore } from '../utils/storage';
+import { FileObjectStore } from '../utils/storage';
 import type { ObjectMap, IObjectStore } from '../utils/storage';
 import { KNOWN_OBJECTS_FILENAME } from '../constants';
 
@@ -34,4 +34,4 @@ export class KnownObjects {
 	}
 }
 
-export const knownObjects: KnownObjects = new KnownObjects(new ObjectStore(KNOWN_OBJECTS_FILENAME));
+export const knownObjects: KnownObjects = new KnownObjects(new FileObjectStore(KNOWN_OBJECTS_FILENAME));

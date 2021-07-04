@@ -22,7 +22,7 @@ const parseFile = <T>(filename: string, parser: LineParserMethod<T>): Array<[ st
 export type AddressMap = Map<string, Address>;
 export type IAddressStore = IStore<AddressMap>;
 
-export class AddressStore implements IAddressStore {
+export class FileAddressStore implements IAddressStore {
 	filename: string;
 
 	constructor(filename: string) {
@@ -45,7 +45,7 @@ export class AddressStore implements IAddressStore {
 export type ObjectMap = Map<string, ApplicationObject>;
 export type IObjectStore = IStore<ObjectMap>;
 
-export class ObjectStore implements IObjectStore {
+export class FileObjectStore implements IObjectStore {
 	filename: string;
 
 	constructor(filename: string) {

@@ -1,6 +1,6 @@
 import { parsePeer } from '../utils/parsing';
 import type { IStore } from '../utils/storage';
-import { AddressStore } from '../utils/storage';
+import { FileAddressStore } from '../utils/storage';
 import {
 	isIPv4Address,
 	isIPv6Address,
@@ -82,4 +82,4 @@ export class PeerAddress {
 	}
 }
 
-export const knownPeers: KnownPeers = new KnownPeers(new AddressStore(KNOWN_PEERS_FILENAME));
+export const knownPeers: KnownPeers = new KnownPeers(new FileAddressStore(KNOWN_PEERS_FILENAME));
