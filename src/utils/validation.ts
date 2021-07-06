@@ -9,6 +9,17 @@ import {
 	Block,
 } from '../types';
 
+type Validator = [() => boolean, string];
+export const evaluateValidators = (validators: Array<Validator>, errorPrefix?: string): void | never => {
+	validators.map(([validator, error]: Validator) => {
+		if (validator()) {
+			return;
+		}
+
+		throw new Error((errorPrefix ? `${errorPrefix}: ` : '') + error);
+	});
+};
+
 export const isString = (x: unknown): boolean => typeof x === 'string';
 
 export const isValidNodeVersion = (version: string): boolean => semverSatisfies(version, LATEST_NODE_SEMVER_VERSION);
@@ -35,6 +46,7 @@ export const isHex = (hex: string, n?: number): boolean => nByteHexRegex(n).test
 export const isValidTransactionId = isSHA256;
 export const isValidNonce = isSHA256;
 export const isValidBlockId = isSHA256;
+export const isValidObjectId = isSHA256;
 export const isValidUNIXTimestamp = (timestamp: string): boolean => !!timestamp && new Date(timestamp).getTime() > 0; 
 export const isValidMiningTarget = (target: string): boolean => isHex(target, 32);
 export const isValidMiner = (miner: string): boolean => printableASCIIRegex(128).test(miner);

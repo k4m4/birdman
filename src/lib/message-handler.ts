@@ -17,9 +17,9 @@ import {
 	BIRDMAN_ADDRESS,
 } from '../constants';
 import {
+	evaluateValidators as validate,
 	isString,
 	isValidNodeVersion,
-	isSHA256,
 	isValidTransactionInput,
 	isValidTransactionOutput,
 	isValidTransactionId,
@@ -29,6 +29,7 @@ import {
 	isValidMiningTarget,
 	isValidMiner,
 	isValidNote,
+	isValidObjectId,
 } from '../utils/validation';
 import { createHash } from '../utils/hashing';
 import type { IConnectionHandler } from './connection-handler';
@@ -99,23 +100,19 @@ class MessageHandler {
 
 	private validateHello (message: HelloMessage) {
 		const { version, agent } = message;
-		const validVersion = version && isString(version);
-		const validAgent = !agent || (agent && isString(agent));
-		if (validVersion && validAgent) {
-			return;
-		}
-
-		throw new Error('Received malformed payload for message of type `hello`');
+		validate([
+			[() => !!version, 'no "version" is specified'],
+			[() => isString(version), '"version" is not a string'],
+			[() => !agent || (!!agent && isString(agent)), '"agent" is not a string'],
+		], 'Received malformed payload for message of type `hello`');
 	}
 
 	private validateError (message: ErrorMessage) {
 		const { error } = message;
-		const validError = error && isString(error);
-		if (validError) {
-			return;
-		}
-
-		throw new Error('Received malformed payload for message of type `error`');
+		validate([
+			[() => !!error, 'no "error" was specified'],
+			[() => isString(error), '"error" is not a string'],
+		], 'Received malformed payload for message of type `error`');
 	}
 
 	private validateGetPeers (message: GetPeersMessage): void {
@@ -124,30 +121,24 @@ class MessageHandler {
 
 	private validatePeers (message: PeersMessage) {
 		const { peers } = message;
-		const validPeers = Array.isArray(peers) && peers.every(peer => typeof peer === 'string');
-		if (validPeers) {
-			return;
-		}
-
-		throw new Error('Received malformed payload for message of type `peers`');
+		validate([
+			[() => Array.isArray(peers), '"peers" is not an array'],
+			[() => peers.every(isString), 'not every peer in "peers" is a string'],
+		], 'Received malformed payload for message of type `peers`');
 	}
 
 	private validateGetObject (message: GetObjectMessage) {
 		const { objectid } = message;
-		if (isString(objectid) && isSHA256(objectid)) {
-			return;
-		}
-
-		throw new Error('Received malformed payload for message of type `getobject`');
+		validate([
+			[() => isValidObjectId(objectid), '"objectid" is invalid'],
+		], 'Received malformed payload for message of type `getobject`');
 	}
 
 	private validateIHaveObject (message: IHaveObjectMessage) {
 		const { objectid } = message;
-		if (isString(objectid) && isSHA256(objectid)) {
-			return;
-		}
-
-		throw new Error('Received malformed payload for message of type `ihaveobject`');
+		validate([
+			[() => isValidObjectId(objectid), '"objectid" is invalid'],
+		], 'Received malformed payload for message of type `ihaveobject`');
 	}
 
 	private validateObject (message: ObjectMessage) {
@@ -162,35 +153,28 @@ class MessageHandler {
 
 	private validateTransaction (object: TransactionObject) {
 		const { inputs, outputs } = object;
-		if (
-			inputs &&
-			Array.isArray(inputs) &&
-			outputs &&
-			Array.isArray(outputs) &&
-			inputs.every(isValidTransactionInput) &&
-			outputs.every(isValidTransactionOutput)
-		) {
-			return;
-		}
-
-		throw new Error('Transaction is invalid');
+		validate([
+			[() => !!inputs, 'no input is specified in "inputs"'],
+			[() => Array.isArray(inputs), '"inputs" is not an array'],
+			[() => !!outputs, 'no output is specified in "outputs"'],
+			[() => Array.isArray(outputs), '"outputs" is not an array'],
+			[() => inputs.every(isValidTransactionInput), 'not every input in "inputs" is valid'],
+			[() => outputs.every(isValidTransactionOutput), 'not every output in "outputs" is valid'],
+		], 'Transaction is invalid');
 	}
 
 	private validateBlock (object: BlockObject) {
-		if (
-			Array.isArray(object.txids) &&
-			object.txids.every(isValidTransactionId) &&
-			isValidNonce(object.nonce) &&
-			(!object.previd || isValidBlockId(object.previd)) &&
-			isValidUNIXTimestamp(object.created) &&
-			isValidMiningTarget(object.T) &&
-			(!object.miner || isValidMiner(object.miner)) &&
-			(!object.note || isValidNote(object.note))
-		) {
-			return;
-		}
-
-		throw new Error('Block is invalid');
+		const { txids, nonce, previd, created, T, miner, note } = object;
+		validate([
+			[() => Array.isArray(txids), '"txids" is not an array'],
+			[() => txids.every(isValidTransactionId), 'not every transaction ID in "txids" is valid'],
+			[() => isValidNonce(nonce), '"nonce" is invalid'],
+			[() => !previd || isValidBlockId(previd), '"previd" is invalid'],
+			[() => isValidUNIXTimestamp(created), '"created" is not a valid UNIX timestamp'],
+			[() => isValidMiningTarget(T), '"T" is not a valid mining target'],
+			[() => !miner || isValidMiner(miner), '"miner" is not a valid string'],
+			[() => !note || isValidNote(note), '"note" is not a valid string'],
+		], 'Block is invalid');
 	}
 
 	private handleHello (message: HelloMessage) {
