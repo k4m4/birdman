@@ -18,7 +18,7 @@ const IPv6Regex = new RegExp('(?:^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-
 const DNSHostnameRegex = new RegExp('(?:^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$)');
 const SHA256Regex = new RegExp('(?:^[A-Fa-f0-9]{64}$)');
 const nByteHexRegex = (n?: number) => new RegExp(`(?:^[A-Fa-f0-9]${n ? `{${n * 2}}` : '+'}$)`);
-const printableASCIIRegex = (length?: number) => new RegExp(`(?:^[\x20-\x7F]${length ? `{${length}}` : '*'}$)`);
+const printableASCIIRegex = (maxLength?: number) => new RegExp(`(?:^[\x20-\x7F]${maxLength ? `{0,${maxLength}}` : '*'}$)`);
 
 export const isIPv4Address = (address: string): boolean => IPv4Regex.test(address);
 export const isIPv6Address = (address: string): boolean => IPv6Regex.test(address);
