@@ -10,17 +10,13 @@ import { socketAddressInfoToAddress } from './utils/socket';
 
 export const connections: ConnectionHandler[] = [];
 
-// TODO: remove initializeHandshake & send hello on connection
-const handleConnection = (options?: {
-    initializeHandshake?: boolean;
-    peerAddress?: PeerAddress;
-}) => (socket: Socket) => {
+const handleConnection = (address?: PeerAddress) => (socket: Socket): void => {
 	const readlineInterface = readline.createInterface({
 		input: socket,
 		output: socket,
 	});
 
-	const peerAddress: PeerAddress = options?.peerAddress || new PeerAddress(socketAddressInfoToAddress(socket.address() as AddressInfo));
+	const peerAddress: PeerAddress = address || new PeerAddress(socketAddressInfoToAddress(socket.address() as AddressInfo));
 	const { host, port } = peerAddress.address;
 
 	const handleConnectionOpen = (): void => {
@@ -43,7 +39,7 @@ const handleConnection = (options?: {
 	const connectionHandler = new ConnectionHandler(socket, peerAddress);
 	connections.push(connectionHandler);
 
-	const messageHandler = new MessageHandler(connectionHandler, options?.initializeHandshake);
+	const messageHandler = new MessageHandler(connectionHandler);
 
 	const handleLineRead = (line: string) => {
 		try {
@@ -77,7 +73,7 @@ const handleConnection = (options?: {
 export const initiateConnection = (peer: PeerAddress): void => {
 	try {
 		const { host, port } = peer.address;
-		const handleCreateConnection = handleConnection({ initializeHandshake: true, peerAddress: peer });
+		const handleCreateConnection = handleConnection(peer);
 		const socket: Socket = createConnection(port, host);
 		handleCreateConnection(socket);
 	} catch (error: unknown) {

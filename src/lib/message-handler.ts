@@ -71,13 +71,11 @@ class MessageHandler {
 		block: (object: ApplicationObject) => this.validateBlock(object as BlockObject),
 	};
 
-	constructor (connection: IConnectionHandler, initiateHandshake = false) {
+	constructor (connection: IConnectionHandler) {
 		this.connection = connection;
 		this.peerAddress = connection.getAddress();
-		if (initiateHandshake) {
-			this.handshakeRequested = true;
-			this.hello();
-		}
+		this.handshakeRequested = true;
+		this.hello();
 	}
 
 	handleMessage (message: Message): void {
