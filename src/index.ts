@@ -1,4 +1,4 @@
-import { createConnection, createServer, Socket } from 'net';
+import { createConnection, createServer, Socket, AddressInfo } from 'net';
 import readline from 'readline';
 import ConnectionHandler from './lib/connection-handler';
 import MessageHandler from './lib/message-handler';
@@ -6,6 +6,7 @@ import type { Message, Error as ErrorMessage } from './types';
 import { PORT, IP } from './constants';
 import { knownPeers, PeerAddress } from './lib/peers';
 import type { Address } from './lib/peers';
+import { socketAddressInfoToAddress } from './utils/socket';
 
 export const connections: ConnectionHandler[] = [];
 
@@ -19,7 +20,7 @@ const handleConnection = (options?: {
 		output: socket,
 	});
 
-	const peerAddress: PeerAddress = options?.peerAddress || new PeerAddress(socket.address() as Address);
+	const peerAddress: PeerAddress = options?.peerAddress || new PeerAddress(socketAddressInfoToAddress(socket.address() as AddressInfo));
 	const { host, port } = peerAddress.address;
 
 	const handleConnectionOpen = (): void => {
