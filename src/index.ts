@@ -43,11 +43,6 @@ const handleConnection = (address?: PeerAddress) => (socket: Socket): void => {
 
 	const handleLineRead = (line: string) => {
 		try {
-			// TODO: figure out a way to not need this
-			if (line.startsWith('PROXY')) {
-				return;
-			}
-
 			const message: Message = JSON.parse(line);
 			messageHandler.handleMessage(message);
 		} catch (error) {
