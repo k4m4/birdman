@@ -273,7 +273,6 @@ class MessageHandler {
 		this.connection.sendMessage(message);
 	}
 
-	// TODO: Create util for this TS Omit
 	private iHaveObject ({ objectid }: Omit<IHaveObjectMessage, 'type'>): void {
 		const message: IHaveObjectMessage = {
 			type: 'ihaveobject',
