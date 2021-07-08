@@ -54,6 +54,5 @@ export const isValidNote = (note: string): boolean => printableASCIIRegex(128).t
 export const isValidOutpoint = (outpoint: Outpoint): boolean => isValidTransactionId(outpoint.txid) && Number.isInteger(outpoint.index) && outpoint.index >= 0;
 export const isValidSignature = (sig: string): boolean => isHex(sig, 64);
 
-// TODO: throw errors for more descriptive feedback on why validation failed
 export const isValidTransactionInput = (input: TransactionInput): boolean => isValidOutpoint(input.outpoint) && isValidSignature(input.sig);
 export const isValidTransactionOutput = (output: TransactionOutput): boolean => isHex(output.pubkey, 32) && Number.isInteger(output.value) && output.value >= 0;
